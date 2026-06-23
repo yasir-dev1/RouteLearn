@@ -22,41 +22,33 @@ class DatabaseHelper {
       version: 1,
       onCreate: (db, verison) async {
         await db.execute('''
-          CREATE TABLE activities(
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            single INTEGER NOT NULL,
-            source TEXT NOT NULL,
-            source_type TEXT NOT NULL
-          );
+            CREATE TABLE activities(
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                single INTEGER NOT NULL,
+                source TEXT NOT NULL,
+                source_type TEXT NOT NULL
+            );
 
-          CREATE TABLE commutes(
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            start_minute INT NOT NULL,
-            end_minute INT NOT NULL
-          );
+            CREATE TABLE commutes(
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                start_minute INTEGER NOT NULL,
+                end_minute INTEGER NOT NULL,
+                CHECK(start_minute < end_minute)
+            );
 
-          
-          CREATE TABLE activity_commute(
-            activity_id INTEGER NOT NULL,
-            commute_id INTEGER NOT NULL,
-            PRIMARY KEY (activity_id, commute_id),
-            FOREIGN KEY (activity_id) REFERENCES activities(id),
-            FOREIGN KEY (commute_id) REFERENCES commutes(id)
-          );
+            CREATE TABLE day_commutes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                commute_id INTEGER NOT NULL,
+                day INTEGER NOT NULL,
+                activity_id INTEGER NOT NULL,
 
-          CREATE TABLE day_commutes(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            day INTEGER NOT NULL,
-            commute_id INTEGER NOT NULL,
-            start_minute INTEGER NOT NULL,
-            end_minute INTEGER NOT NULL,
+                FOREIGN KEY(commute_id) REFERENCES commutes(id),
+                FOREIGN KEY(activity_id) REFERENCES activities(id),
 
-            FOREIGN KEY (commute_id) REFERENCES commutes(id),
-
-            CHECK(start_minute < end_minute)
-        );
+                UNIQUE(commute_id, day)
+            );
 
         ''');
       },
